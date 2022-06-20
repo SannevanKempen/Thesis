@@ -1,6 +1,5 @@
 % initialize
 
-% not working!
 tic
 clear all
 [n,v0,edges,r,x,ind_PVs] = TWONODES(); % bus numbering: substation is node 1
