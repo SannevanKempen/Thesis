@@ -1,0 +1,57 @@
+% legend 
+\pgfdeclareverticalshading{legend}{.5cm}{rgb(0cm)=(BOT1,BOT2,BOT3); rgb(6cm)=(MID1,MID2,MID3); rgb(12cm)=(TOP1,TOP2,TOP3)}
+\draw (0cm,0cm) node {\pgfuseshading{legend}} ; 
+% tikz on legend 
+\draw (-.25cm,6cm) node[left] {X} -- ++(0.5cm,0cm);
+\draw (-.25cm,3cm) node[left] {X} -- ++(0.5cm,0cm);
+\draw (-.25cm,0cm) node[left] {X} -- ++(0.5cm,0cm);
+\draw (-.25cm,-3cm) node[left] {X} -- ++(0.5cm,0cm);
+\draw (-.25cm,-6cm) node[left] {X} -- ++(0.5cm,0cm);
+% vertices
+\node[roundnode,fill={rgb,255:red,255; green,255; blue,255}] at (2cm,5.7cm) (1) {0};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 1] (2) {1};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 2,xshift=0.5cm] (3) {2};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 3,xshift=1.5cm] (4) {3};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 4,xshift=1.5cm] (5) {4};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 5,xshift=1cm] (6) {5};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 6,xshift=1cm] (7) {6};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 7,xshift=3cm] (8) {7};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 8,xshift=3cm] (9) {8};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 9,xshift=1cm] (10) {9};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 10,xshift=1cm] (11) {10};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 11,xshift=.5cm] (12) {11};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 2,xshift=-0.5cm] (13) {12};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 13] (14) {13};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 3] (15) {14};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 14] (16) {15};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 16] (17) {16};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 15] (18) {17};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 18] (19) {18};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 4] (20) {19};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 20,xshift=0.5cm] (21) {20};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 21] (22) {21};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 22] (23) {22};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 21,xshift=-1cm] (24) {23};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 20,xshift=-0.5cm] (25) {24};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 5] (26) {25};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 6] (27) {26};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 27] (28) {27};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 28] (29) {28};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 29] (30) {29};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 27,xshift=-1cm] (31) {30};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 7] (32) {31};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 32] (33) {32};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 33] (34) {33};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 8,xshift=1cm] (35) {34};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 35,xshift=-1cm] (36) {35};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 35] (37) {36};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 35,xshift=1cm] (38) {37};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 8,xshift=-2cm] (39) {38};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 8,xshift=-1cm] (40) {39};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 8,xshift=0cm] (41) {40};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 9] (42) {41};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 42] (43) {42};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 43,xshift=-.5cm] (44) {43};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 43,xshift=.5cm] (45) {44};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 10] (46) {45};
+\node[roundnode,fill={rgb,255:red,X; green,Y; blue,Z}, below of = 11,xshift=-.5cm] (47) {46};
