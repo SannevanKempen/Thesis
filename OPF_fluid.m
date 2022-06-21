@@ -52,8 +52,12 @@ W(1,1)==v0^2;
 
 % objective function
 F = cvx(zeros(1,I));
+% w(1) = 0;
+% w(2) = 0.01;
+% w(3) = 0.015;
 for i=2:I
     if lambda(i)>0
+%         F(i)= (lambdaK(i)/nu(i))*w(i)*log(pcon_socp(i))-mu(i)*w(i)*pcon_socp(i)/nu(i);
         F(i)= (lambdaK(i)/nu(i))*log(pcon_socp(i))-mu(i)*pcon_socp(i)/nu(i); % Markovian model!
     end
 end
@@ -69,11 +73,13 @@ eye(I)*qgen_socp' <= qgenub';
 W(i,i)>=v0^2*(1-delta)^2; % volt drop
 W(i,i)<=v0^2*(1+delta)^2;
 
-YW = sum(conj(Y).*W,2); % SOCP PFE
-for i=1:I
-    pgen_socp(i) - pcon_socp(i) + 1i*qgen_socp(i) == YW(i)
+WY = sum(W.*conj(Y),2); % SOCP PFE
+for i=2:I
+    pgen_socp(i) - pcon_socp(i) + 1i*qgen_socp(i) == WY(i)
     if lambda(i) > 0
         pcon_socp(i) <= g(i);
+    else
+        pcon_socp(i) <= 0;
     end
 end
 cvx_end

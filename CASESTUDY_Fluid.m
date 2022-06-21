@@ -2,8 +2,8 @@
 
 tic
 clear all
-[n,v0,edges,r,x,ind_PVs] = TWONODES(); % bus numbering: substation is node 1
-% [n,v0,edges,r,x,ind_PVs] = SCE47_adapted();
+% [n,v0,edges,r,x,ind_PVs] = TWONODES(); % bus numbering: substation is node 1
+[n,v0,edges,r,x,ind_PVs] = SCE47_adapted();
 savingfile = 'ChargingProbSCE47.mat';
 % [n,v0,edges,r,x,ind_PVs] = SCE56();
 % savingfile = 'ChargingProbSCE56.mat';
@@ -33,17 +33,16 @@ Amat= [1/((1-delta)*v0)*Rmat+1/((1-delta)*v0)*Xmat    1/((1-delta)*v0)*Xmat-1/((
 n = n-1; % bus numbering: substation is node 0
 pconub = 10^3*ones(1,n); % practically unbounded
 pgenub = zeros(1,n);
-pgenub(ind_PVs - 1) = 1;
+pgenub(ind_PVs - 1) = 0;
 qgenub = tan(acos(1))*pgenub;
-lambda = 12*ones(1,n); %1/n*ones(1,n);
+lambda = 1/46*ones(1,n); %1/n*ones(1,n);
 mu = 1*ones(1,n);
-nu = 1*ones(1,n);
-K = 10*ones(1,n);
-c = 1000;
+nu = .5*ones(1,n);
+K = 1*ones(1,n);
+c = 1;
 
 %% OPF (SOCP + MOD)
-[pcon_mod,pgen_mod,qgen_mod,pcon_socp,pgen_socp,qgen_socp,volt_fluid,YW,W,g] = Test(n,Ymat,Amat,v0,delta,pconub,pgenub,qgenub,lambda,mu,nu,K,c);
-% [pcon_mod,pgen_mod,qgen_mod,pcon_socp,pgen_socp,qgen_socp,volt_fluid] = OPF_fluid(n,Ymat,Amat,v0,delta,pconub,pgenub,qgenub,lambda,mu,nu,K,c);
+[pcon_mod,pgen_mod,qgen_mod,pcon_socp,pgen_socp,qgen_socp,volt_fluid] = OPF_fluid(n,Ymat,Amat,v0,delta,pconub,pgenub,qgenub,lambda,mu,nu,K,c);
 power = [pcon_socp(2:end); pcon_mod];
 %% ANALYSIS 
 lambdaK = Erlangloss(n,K,lambda,nu);
@@ -57,12 +56,12 @@ for i = 1:n
     end
 end
 end
-power(1,:)
-z(1,:)
+power
+z
 
-xi = sum(power(1,:));
-lam = sum(z(1,:));
-omega = 1-sum(z(1,:))/sum(lambdaK./nu);
+xi = sum(power(1,:))
+lam = sum(z(1,:))
+omega = 1-sum(z(1,:))/sum(lambdaK./nu)
 
 xi = sum(power(2,:));
 lam = sum(z(2,:));

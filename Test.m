@@ -39,20 +39,19 @@ g = f(c);
 
 cvx_begin sdp quiet
 variables pcon_socp(1,I);
-variable  W(I,I);
-W >= 0; % semi-definite
+variable  W(I,I) semidefinite;
 W==W'; % symmetric
 W(1,1)==v0^2;
 
 % objective function
 F = cvx(zeros(1,I));
-% w(1) = 0;
-% w(2) = 0.01;
-% w(3) = 0.015;
+w(1) = 0;
+w(2) = 0.01;
+w(3) = 0.015;
 for i=2:I
     if lambda(i)>0
-%         F(i)= (lambdaK(i)/nu(i))*w(i)*log(pcon_socp(i))-mu(i)*w(i)*pcon_socp(i)/nu(i);
-        F(i)= (lambdaK(i)/nu(i))*log(pcon_socp(i))-mu(i)*pcon_socp(i)/nu(i); % Markovian model!
+        F(i)= (lambdaK(i)/nu(i))*w(i)*log(pcon_socp(i))-mu(i)*w(i)*pcon_socp(i)/nu(i);
+%         F(i)= (lambdaK(i)/nu(i))*log(pcon_socp(i))-mu(i)*pcon_socp(i)/nu(i); % Markovian model!
     end
 end
 T=sum(F);
