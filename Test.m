@@ -1,83 +1,91 @@
-function[pcon_mod,pgen_mod,qgen_mod,pcon_socp,pgen_socp,qgen_socp,volt_socp,YW,W,g] = Test(n,Y,A,v0,delta,pconub,pgenub,qgenub,lambda,mu,nu,K,c);
-%% modified
+eta = .9;
+gamma = .1;
+delta = .1;
 
-lambdaK = Erlangloss(n,K,lambda,nu);
-f = @(x) lambdaK.*x./(x.*mu+nu); % Markovian model!
-g = f(c);
-
-cvx_begin sdp quiet
-variables pcon_mod(1,n);
-
-% objective function
-F = cvx(zeros(1,n));
+n = 2; % 3;
+v0 = 1;
+edges = zeros(n-1,2);
+edges(1,1) = 1; % [1 2; 2 3];
+edges(1,2) = 2;
+r = [0.05]; % [.05 .05];
+x = eta*r;
+ind_PVs = [];
+% matpower_name = 'matpower_cases/case_two_nodes.m';
+matpower_name = 'matpower_cases/case_one_node.m';
+p = 1;
+q = gamma*p;
+s = p+1i*q;
+Ymat = zeros(n,n);
+for i=1:n-1
+    Ymat(edges(i,1),edges(i,2)) = -1/(r(i)+1i*x(i));
+    Ymat(edges(i,2),edges(i,1)) = -1/(r(i)+1i*x(i));
+end
 for i=1:n
-    if lambda(i)>0
-        F(i)= (lambdaK(i)/nu(i))*log(pcon_mod(i))-mu(i)*pcon_mod(i)/nu(i); % Markovian model!
+    Ymat(i,i) = -sum(Ymat(i,:));
+end
+Zmat = inv(Ymat(2:end,2:end));
+Rmat = real(Zmat);
+Xmat = imag(Zmat);
+Gmat = real(Ymat);
+Bmat = imag(Ymat);
+mpc = loadcase(matpower_name);
+mpc.gen(1, 6) = v0; % set correct values for v0,r and x in mpc
+for j=1:n-1
+    mpc.branch(j, 3) = r(j);
+    mpc.branch(j, 4) = x(j);
+    mpc.bus(j+1,3) = p;
+    mpc.bus(j+1,4) = q;
+end
+
+mag = zeros(1,n);
+angles = zeros(1,n);
+[results,succes] = runpf(mpc,mpoption('verbose',0,'out.all',0));
+if succes == 1
+    nr_of_violations = sum(results.bus(:,8) < (1-delta)*v0) + sum(results.bus(:,8) > (1+delta)*v0);
+    if nr_of_violations == 0
+        mag = results.bus(:,8)'
+        angles = deg2rad(results.bus(:,9))'
+        
+        cosangles = cos(angles)
+        sinangles = sin(angles)
+        
+        pc = max(p,0);
+        pg = max(-p,0);
+        
+        cosbounds = [((1-delta)^2*v0^2+(1-eta*gamma)*r*pc-r*pg)/((1+delta)*v0^2) ((1+delta)^2*v0^2+r*pc+(-1+eta*gamma)*r*pg)/((1-delta)*v0^2)]
+        sinbounds = [(-gamma*r*pg - eta*r*pc)/((1+delta)*v0^2) (gamma*r*pc+eta*r*pg)/((1-delta)*v0^2)]
     end
 end
-T=sum(F);
-maximize(T);
 
-%constraints
-A*[pcon_mod zeros(1,n) zeros(1,n) zeros(1,n)]' <= delta*v0
-eye(n)*[pcon_mod]' >= 0;
-eye(n)*pcon_mod' <= pconub';
-eye(n)*pcon_mod' <= g';
-cvx_end
 
-%% SOCP
-I = n+1;
-pconub = [10^3 pconub];
-lambda = [0 lambda];
-mu = [0 mu];
-nu = [0 nu];
-K = [0 K];
 
-lambdaK = Erlangloss(I,K,lambda,nu);
-f = @(x) lambdaK.*x./(x.*mu+nu); % Markovian model!
-g = f(c);
 
-cvx_begin sdp quiet
-variables pcon_socp(1,I);
-variable  W(I,I) semidefinite;
-W==W'; % symmetric
-W(1,1)==v0^2;
+% sind(meshgrid(angles) - meshgrid(angles)');
+% cosd(meshgrid(angles) - meshgrid(angles)');
+%
+% V0 = mag(1)*exp(1i*(angles(1)));
+% V1 = mag(2)*exp(1i*(angles(2)));
+% V2 = mag(3)*exp(1i*(angles(3)));
+%
+% V1*conj(V0)*conj(Ymat(2,1))+V1*conj(V1)*conj(Ymat(2,2))+V1*conj(V2)*conj(Ymat(2,3));
+% V2*conj(V0)*conj(Ymat(3,1))+V2*conj(V1)*conj(Ymat(3,2))+V2*conj(V2)*conj(Ymat(3,3));
+%
+%
+% mag(1)*mag(2)*(Bmat(2,1)*sin(angles(2)-angles(1))+Gmat(2,1)*cos(angles(2)-angles(1)))+mag(2)*mag(2)*(Bmat(2,2)*sin(angles(2)-angles(2))+Gmat(2,2)*cos(angles(2)-angles(2))) +mag(3)*mag(2)*(Bmat(2,3)*sin(angles(2)-angles(3))+Gmat(2,3)*cos(angles(2)-angles(3)));
+% sin(angles(2)-angles(1));;
+%
+% (mag(1)*Gmat(2,1)*(sin(angles(1))+eta*cos(angles(1))) + mag(2)*Gmat(2,2)*(sin(angles(2))+eta*cos(angles(2))) + mag(3)*Gmat(2,3)*(sin(angles(3))+eta*cos(angles(3))))/(mag(1)*Gmat(2,1)*(-eta*sin(angles(1))+cos(angles(1))) + mag(2)*Gmat(2,2)*(-eta*sin(angles(2))+cos(angles(2))) + mag(3)*Gmat(2,3)*(-eta*sin(angles(3))+cos(angles(3))));
+% (mag(1)*Gmat(3,1)*(sin(angles(1))+eta*cos(angles(1))) + mag(2)*Gmat(3,2)*(sin(angles(2))+eta*cos(angles(2))) + mag(3)*Gmat(3,3)*(sin(angles(3))+eta*cos(angles(3))))/(mag(1)*Gmat(2,1)*(-eta*sin(angles(1))+cos(angles(1))) + mag(2)*Gmat(2,2)*(-eta*sin(angles(2))+cos(angles(2))) + mag(3)*Gmat(2,3)*(-eta*sin(angles(3))+cos(angles(3))));
+%
 
-% objective function
-F = cvx(zeros(1,I));
-w(1) = 0;
-w(2) = 0.01;
-w(3) = 0.015;
-for i=2:I
-    if lambda(i)>0
-        F(i)= (lambdaK(i)/nu(i))*w(i)*log(pcon_socp(i))-mu(i)*w(i)*pcon_socp(i)/nu(i);
-%         F(i)= (lambdaK(i)/nu(i))*log(pcon_socp(i))-mu(i)*pcon_socp(i)/nu(i); % Markovian model!
-    end
-end
-T=sum(F);
-maximize(T);
 
-% constraints
-eye(I)*[pcon_socp]' >= 0; % admissible set
-eye(I)*pcon_socp' <= pconub';
 
-W(i,i)>=v0^2*(1-delta)^2; % volt drop
-W(i,i)<=v0^2*(1+delta)^2;
 
-YW = sum(W.*conj(Y),2); % SOCP PFE
-for i=2:I
-    -pcon_socp(i) == YW(i);
-    if lambda(i) > 0
-        pcon_socp(i) <= g(i);
-    else
-        pcon_socp(i) == 0
-    end
-end
-cvx_end
 
-volt_socp = diag(W);
-pgen_mod = zeros(1,n);
-pgen_socp = zeros(1,I);
-qgen_mod = zeros(1,n);
-qgen_socp = zeros(1,I);
-end
+
+
+
+
+
+
+

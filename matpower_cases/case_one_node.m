@@ -11,7 +11,6 @@ mpc.baseMVA = 1;
 mpc.bus = [
 	1	3	0	0	0	0	1	1	0	1	1	100	0;
 	2	1	0	0	0	0	1	1	0	1	1	100	0;
-	3	1	0	0	0	0	1	1	0	1	1	100	0;
 ];
 
 %% generator data
@@ -24,5 +23,4 @@ mpc.gen = [
 %	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
 mpc.branch = [
     1	2	0.01	0	0	0	0	0	0	0	1	-360	360;
-	2	3	0.01	0	0	0	0	0	0	0	1	-360	360;
 ];

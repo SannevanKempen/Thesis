@@ -1,9 +1,22 @@
 clear all
-[n,v0,edges,r,x,ind_PVs] = TWONODES();
-matpower_name = 'matpower_cases/case_two_nodes.m';
+
+% [n,v0,edges,r,x,ind_PVs] = TWONODES();
+% r = [0.01 0.01];
+% x = [0 0];
+% ind_PVs = [];
+% matpower_name = 'matpower_cases/case_two_nodes.m';
+% % savingfile = 'Risk_twonode_g0.mat';
+% savingfile = 'Risk_twonode_g0.5.mat';
 
 [n,v0,edges,r,x,ind_PVs] = SCE47_adapted(); % bus numbering: substation is node 1
+x = zeros(1,46);
 matpower_name = 'matpower_cases/case_SCE47.m';
+% savingfile = 'Risk_SCE47_g0.mat';
+savingfile = 'Risk_SCE47_g3.mat';
+
+% [n,v0,edges,r,x,ind_PVs] = TWENTYONENODES();
+% ind_PVs = [14 22];
+% matpower_name = 'matpower_cases/case_21.m';
 
 delta = 0.1;
 
@@ -27,29 +40,31 @@ for j=1:n-1
 end
 %% SIMULATIONS (MODIFIED + ORIGINAL OPF)
 n = n-1;
-runs = 10^4; % 10^4 for thesis plots
-
-range = [0:.001:.01]; % stepsize 0.5 for thesis plots
+range = logspace(-3,-2,30); % 30 points. Interval [0,1] for twonode g=0; [0,1.2] g=0.5; [-3,-2] SCE-47 g=0; [-3,-2] g=3
 pointsP = zeros(1,length(range));
 pointsS = zeros(1,length(range));
-tic
+
 for j=1:length(range)
+    tic
     disp("progress bar "+ num2str(j)+ "/" +num2str(length(range)))
     mean = range(j);
-    
+    if j < length(range)/4
+        runs = 5*10^4; %5*10^4;
+    else
+        runs = 5*10^4; %5*10^3;
+    end
     % twonode
 %     mucon = mean*ones(1,n); 
-%     mugen = 0*mean*ones(1,n); % 0 or .5
+%     mugen = 0.5*mean*ones(1,n); % 0 or .5
 %     sigmacon = eye(n);
-%     sigmagen = [1 1; 1 1];
+%     sigmagen = ones(n,n);
 %     sampleplus = max(mvnrnd(mucon,sigmacon,runs),0);
 %     samplemin = max(mvnrnd(mugen,sigmagen,runs),0);
     
-    % SCE47
+%     % SCE47
     mucon = mean*ones(1,n);
     sigmacon = 0.0001*eye(n);
     sampleplus = max(mvnrnd(mucon,sigmacon,runs),0);
-    
     nPVs = length(ind_PVs);
     samplemin = zeros(runs,n);
     mugen = 3*mean*ones(1,nPVs); % 0 or 3
@@ -72,25 +87,37 @@ for j=1:length(range)
             end
         end
     end
+    toc
 end
 
 probP = pointsP/runs;
 probS = pointsS/runs;
+save(savingfile,'probP','probS','range','runs');
+
+clear all
+load('Risk_twonode_g0.mat');
+% load('Risk_twonode_g0.5.mat');
+% load('Risk_SCE47_g0.mat');
+% load('Risk_SCE47_g3.mat');
+probS = 1-probS;
+probP = 1-probP;
 
 figure
-fontsize = 35;
-linewidth = 3;
-plot(range, probS,'LineWidth',linewidth)
-hold on
-plot(range, probP,'LineWidth',linewidth)
-hold off
-xlabel({'$m$'},'Interpreter','latex')
-legend({'$\pi_S$','$\pi_P$'},'Interpreter','latex','FontSize',fontsize+5);
+fontsize = 30;
+linewidth = 2;
+loglog(range, probP,range, probS,'LineWidth',linewidth)
+grid on
+ylim([.01 1])
+yticks([0.05 0.1 0.5 1])
+% yticks([.4:.1:1])
+% xlim([1 10])
+xlabel({'$m$'},'Interpreter','latex','FontSize',fontsize+5)
+legend({'$\pi_P$','$\pi_S$'},'Location','northwest','Interpreter','latex','FontSize',fontsize+5);
 set(gca,'FontSize',fontsize)
-set(gcf, 'Units', 'Inches', 'Position', [0, 0, 20, 20], 'PaperUnits', 'Inches', 'PaperSize', [15, 10])
-saveas(gca,'risk_sce47_1','epsc') %gcf
+set(gcf, 'Units', 'Inches', 'Position', [0, 0, 12, 20], 'PaperUnits', 'Inches', 'PaperSize', [10, 20])
+saveas(gca,'Risk_twonode_g0','epsc') %gcf
 
-toc
+
 
 %% THEORY (MODIFIED) (didnt work out in the end; simulations suffice)
 % probmod = 1;

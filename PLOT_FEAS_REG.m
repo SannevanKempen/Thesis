@@ -10,7 +10,9 @@ v0 = 1;
 edges = [1 2; 2 3];
 delta = 0.1;
 r = [0.01 0.01];
-x = [0 0];
+% x = [0.01 0.01];
+x = [0.001 0.001];
+x = 0.01*tan(acos(.9))*ones(1,2);
 matpower_name = 'matpower_cases/case_two_nodes.m';
 
 %% matpower
@@ -44,14 +46,16 @@ Amat= [1/((1-delta)*v0)*Rmat+1/((1-delta)*v0)*Xmat    1/((1-delta)*v0)*Xmat-1/((
 
 %% FEASIBILITY PLOTS
 
-% savingfile = 'PolyPlotx0.01q0r0.01d0.1zoom.mat'
+% savingfile = 'PolyPlotx0.001p0r0.01d0.1zoom.mat';
+% savingfile = 'PolyPlotx0.001pc3r0.01d0.1zoom.mat';
+% savingfile = 'PolyPlotx0.001pg3r0.01d0.1zoom.mat';
 
-pmin = -40;
-qmin = -30;
-pmax = 30;
-qmax = 30;
+pmin = -50;
+qmin = -50;
+pmax = 10;
+qmax = 40;
 
-step = 2; % for thesis: 0.01 but takes loooong time
+step = 1; % for thesis: .05 for large plots and 0.01 for zoom (takes loooong time)
 prange = [pmin:step:pmax];
 qrange = [qmin:step:qmax];
 
@@ -62,23 +66,23 @@ B_feas = zeros(length(prange),length(qrange));
 for i=1:length(prange)
     disp(prange(i)) % manual progress bar
     for j=1:length(qrange)
-        pcon = [0; 0];
-        pgen = [0; 0];
-        qcon = [0; 0];
+        pcon = [0; 0]; % 3
+        pgen = [0; 0]; % 3
+        qcon = [0; 0]; % tan(acos(.9))*pcon(1)
         qgen = [0; 0]; % tan(acos(.9))*pgen(1)
         if prange(i) >= 0
-            %             pcon(2) = prange(i);
-            pcon(1) = prange(i);
+                        pcon(2) = prange(i);
+%             pcon(1) = prange(i);
         else
-            %             pgen(2) = -prange(i);
-            pgen(1) = -prange(i);
+                        pgen(2) = -prange(i);
+%             pgen(1) = -prange(i);
         end
         if qrange(j) >= 0
-            %             qcon(2) = qrange(j);
-            pcon(2) = qrange(j);
+                        qcon(2) = qrange(j);
+%             pcon(2) = qrange(j);
         else
-            %             qgen(2) = -qrange(j);
-            pgen(2) = -qrange(j);
+                        qgen(2) = -qrange(j);
+%             pgen(2) = -qrange(j);
         end
         p = pcon-pgen;
         q = qcon-qgen;
@@ -108,7 +112,15 @@ end
 sum(sum(S_feas-R_feas<0))
 toc
 
+% 'PolyPlotx0q0r0.01d0.1.mat'
+% 'PolyPlotx0q0r0.01d0.3.mat'
+% 'PolyPlotx0q0r0.05d0.1.mat'
 
+% 'PolyPlotx0.001p0r0.01d0.1.mat'
+% 'PolyPlotx0.001pc3r0.01d0.1.mat'
+% 'PolyPlotx0.001pg3r0.01d0.1.mat'
+filename = 'PolyPlotx0.001p0r0.01d0.1.mat';
+load(filename)
 % plotting
 result = S_feas + 1*R_feas + 3*B_feas;%
 fontsize = 35;
@@ -116,13 +128,11 @@ mymap1 = [1 1 1;1 0 0;0 0 1;1 1 0; 1 1 0;0 1 0];
 h = figure;
 h = pcolor(prange,qrange,result');
 colormap(mymap1)
-set(gca, 'CLim', [0, 5])
+set(gca, 'CLim', [0, 5]) 
 set(h, 'EdgeColor', 'none');
-
 % axes and grid
 %     xlim([-5 5]);
-%     ylim([-5 5]);
-
+%     ylim([-10 10]);
 xlim([pmin pmax]);
 ylim([qmin qmax]);
 xl = xlim;
@@ -135,17 +145,14 @@ for col = xl(1) : 5 : xl(end) % p1range(1) : 1 : p1range(end)
     line([col, col], [yl(1), yl(end)], 'Color', 'black'); % line([col, col], [p2range(1), p2range(end)], 'Color', 'black');
 end
 hold off
-lbs = {'$S$','$R$','$B$'};
+lbs = {'$S$','$P$','$B$'};
 cols = [patch(NaN,NaN,mymap1(2,:)) patch(NaN,NaN,mymap1(3,:)) patch(NaN,NaN,mymap1(4,:))];
 legend(cols, lbs,'Interpreter','latex','FontSize',fontsize,'Location','northeast');
-
-    xlabel('$p_1$','Interpreter','latex')
-    ylabel('$p_2$','Interpreter','latex')
-
-% xlabel('$p_2$','Interpreter','latex')
-% ylabel('$q_2$','Interpreter','latex')
+%     xlabel('$p_1$','Interpreter','latex')
+%     ylabel('$p_2$','Interpreter','latex')
+xlabel('$p_2$','Interpreter','latex')
+ylabel('$q_2$','Interpreter','latex')
 set(gca,'FontSize',fontsize)
-
 xl = get(gca,'XLabel'); % overkill code to obtain different fontsize for ticks and labels
 xlFontSize = get(xl,'FontSize');
 xAX = get(gca,'XAxis');
@@ -156,11 +163,10 @@ ylFontSize = get(yl,'FontSize');
 yAY = get(gca,'YAxis');
 set(yAY,'FontSize', 25)
 set(yl, 'FontSize', ylFontSize);
-
 set(gcf, 'PaperUnits', 'inches');
 x_width=12.78 ;y_width=8.94;
 set(gcf, 'PaperPosition', [0 0 x_width y_width]); %
-saveas(gcf,'Feasreg','epsc')
+saveas(gcf,'Plot','epsc')
 
 % save(savingfile,'result','S_feas','R_feas','B_feas','prange','qrange','pmin','pmax','qmin','qmax','step');
 
