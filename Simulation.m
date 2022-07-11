@@ -33,7 +33,7 @@ arrivals = [exprnd(1/(2*lambda))];
 chargesnode1 = [];
 chargesnode2 = [];
 
-runtime = 20000;
+runtime = 10000;
 warmuptime = 0.95*runtime;
 t = 0;
 previous_t = 0;

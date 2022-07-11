@@ -2,8 +2,8 @@ clear all
 lambda = .5;
 mu = 1;
 
-t = [.1 : .1 : .9]; %[0.01:0.01:1];
-nrRuns = 50;
+t = [.1 : .05 : .9]; %[0.01:0.01:1];
+nrRuns = 100;
 EZ1 = zeros(nrRuns,length(t));
 EZ2 = zeros(nrRuns,length(t));
 Epower1 = zeros(nrRuns,length(t));
@@ -79,7 +79,7 @@ plot(t, EZDF,'x','MarkerSize',25,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 
 % errorbar(t,EZDF,EZ1CI95(2,:),'o','MarkerSize',10)
 hold off
 grid on;
-xlim([0.05 .95])
+xlim([0.03 .95])
 % ylim([0 1])
 xlabel({'$\Delta$'},'Interpreter','latex','FontSize',fontsize+5)
 ylabel({'EVs'},'Interpreter','latex','FontSize',fontsize+5)

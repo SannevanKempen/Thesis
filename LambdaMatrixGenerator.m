@@ -3,7 +3,7 @@
 % Optimization properties
 clear;
 tic
-range = [.1 : .1 : .9];
+range = [.05 : 1 : .95];
 for m=1:length(range)
     vars = {'delta','Ymat','Zmat','Rmat','Xmat','Amat','LambdaMatrix','temp','n','alc_mod','alc_socp','alc_ldf','socp'};
     clear(vars{:})
@@ -13,7 +13,7 @@ for m=1:length(range)
     x = [0 0];
     u = [1 1];
     v0 = 1;
-    K = 20;
+    K = 25;
     P2gen=0;
     Q2gen=0;
     
@@ -33,8 +33,6 @@ for m=1:length(range)
         1/((1-delta)*v0)*Rmat-1/((1+delta)*v0)*Xmat    1/((1-delta)*v0)*Xmat+1/((1-delta)*v0)*Rmat   -1/((1+delta)*v0)*Rmat+1/((1-delta)*v0)*Xmat   -1/((1+delta)*v0)*Xmat-1/((1+delta)*v0)*Rmat;
         -1/((1+delta)*v0)*Rmat+1/((1-delta)*v0)*Xmat   -1/((1+delta)*v0)*Xmat-1/((1+delta)*v0)*Rmat    1/((1-delta)*v0)*Rmat-1/((1+delta)*v0)*Xmat    1/((1-delta)*v0)*Xmat+1/((1-delta)*v0)*Rmat;
         -1/((1+delta)*v0)*Rmat-1/((1+delta)*v0)*Xmat   -1/((1+delta)*v0)*Xmat+1/((1-delta)*v0)*Rmat    1/((1-delta)*v0)*Rmat+1/((1-delta)*v0)*Xmat    1/((1-delta)*v0)*Xmat-1/((1+delta)*v0)*Rmat];
-    
-    
     
     LambdaMatrix = zeros(K+2,K+2,9); % need larger matrix first/last row/column will not be used in mathematica calculations anyway
     temp = 1;
@@ -69,6 +67,6 @@ for m=1:length(range)
     % save(['LambdaMatrices/ldf' num2str(K) '_' num2str(P2gen) '.mat'],'ldf');
     % save(['LambdaMatrices/socp' num2str(K) '_' num2str(P2gen) '.mat'],'socp');
     
-%         save(['LambdaMatrices/LambdaMatrixSimulation' num2str(delta) '.mat'],'socp');
+        save(['LambdaMatrices/LambdaMatrixSimulation' num2str(delta) '.mat'],'socp');
     % test=load('LambdaMatrices/test0.2.mat')
 end
